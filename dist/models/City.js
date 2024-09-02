@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose = require("mongoose");
+const citySchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true },
+    status: { type: String, required: true },
+    created_at: { type: Date, required: true, default: new Date() },
+    updated_at: { type: Date, required: true, default: new Date() },
+});
+exports.default = mongoose.model('cities', citySchema);
