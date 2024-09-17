@@ -33,6 +33,7 @@
     "nodemailer": "^6.9.14",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "nodemon": "^3.1.4",
+    "redis": "^4.7.0",
     "save": "^2.9.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

@@ -12,5 +12,11 @@ export const DevEnvironment: Environment = {
         user: process.env.DEV_GMAIL_USER,
         pass: process.env.DEV_GMAIL_PASS
     },
+    redis: {
+        username : process.env.LOCAL_REDIS_USERNAME,
+        password : process.env.LOCAL_REDIS_PASSWORD,
+        host : process.env.LOCAL_REDIS_HOST,
+        port : parseInt(process.env.LOCAL_REDIS_PORT)
+    }
 
 }
