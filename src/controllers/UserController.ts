@@ -31,18 +31,28 @@ export class UserController {
         status,
       };
 
-      let user = await new User(data).save();
+      const user = await new User(data).save();
+      const user_data = {
+        email : user.email,
+        email_verified : user.email_verified,
+        phone : user.phone,
+        name : user.name,
+        type : user.type,
+        status : user.status,
+        created_at : user.created_at,
+        updated_at : user.updated_at
+      }
       const payload = {
         // aud: user._id,
         email: user.email,
         type : user.type
       };
       const access_token = Jwt.jwtSign(payload , user._id);
-      const refresh_token = Jwt.jswtSignRefreshToken(payload , user._id);
+      const refresh_token = await Jwt.jswtSignRefreshToken(payload , user._id);
       res.json({
         token: access_token,
         refreshToken : refresh_token,
-        user: user,
+        user: user_data,
       });
       await NodeMailer.sendMail({
         to: [user.email],
@@ -70,7 +80,15 @@ export class UserController {
           updated_at: new Date(),
         },
         {
-          new: true,
+          new: true, projection :{
+            verification_token : 0,
+            verification_token_time : 0,
+            password : 0,
+            reset_password_token : 0,
+            reset_password_token_time : 0,
+            __v:0,
+            _id : 0
+          }
         }
       );
       if (user) {
@@ -129,11 +147,23 @@ export class UserController {
         type : user.type
       };
       const access_token = Jwt.jwtSign(payload , user._id);
-      const refresh_token = Jwt.jswtSignRefreshToken(payload , user._id);
+      const refresh_token = await Jwt.jswtSignRefreshToken(payload , user._id);
+
+      const user_data = {
+        email : user.email,
+        email_verified : user.email_verified,
+        phone : user.phone,
+        name : user.name,
+        type : user.type,
+        status : user.status,
+        created_at : user.created_at,
+        updated_at : user.updated_at
+      }
+
       res.json({
         token: access_token,
         refreshToken : refresh_token,
-        user: user,
+        user: user_data,
       });
     } catch (e) {
       next(e);
@@ -189,7 +219,15 @@ export class UserController {
           password: encryptedPassword,
         },
         {
-          new: true,
+          new: true, projection :{
+            verification_token : 0,
+            verification_token_time : 0,
+            password : 0,
+            reset_password_token : 0,
+            reset_password_token_time : 0,
+            __v:0,
+            _id : 0
+          }
         }
       );
       if (Updateduser) {
@@ -208,7 +246,17 @@ export class UserController {
     try {
       const profile = await User.findById(user.aud);
       if (profile) {
-        res.json(profile);
+        const user_data = {
+          email : profile.email,
+          email_verified : profile.email_verified,
+          phone : profile.phone,
+          name : profile.name,
+          type : profile.type,
+          status : profile.status,
+          created_at : profile.created_at,
+          updated_at : profile.updated_at
+        }
+        res.json(user_data);
       } else {
         throw new Error("User dosnt exist");
       }
@@ -229,7 +277,14 @@ export class UserController {
         updated_at : new Date()
       },
       {
-        new : true
+        new: true, projection :{
+          verification_token : 0,
+          verification_token_time : 0,
+          password : 0,
+          reset_password_token : 0,
+          reset_password_token_time : 0,
+          __v:0
+        }
       }
     );
 
@@ -266,7 +321,15 @@ export class UserController {
           updated_at : new Date()
         },
         {
-          new : true
+          new: true, projection :{
+            verification_token : 0,
+            verification_token_time : 0,
+            password : 0,
+            reset_password_token : 0,
+            reset_password_token_time : 0,
+            __v:0,
+            _id : 0
+          }
         }
       );
       const payload = {
@@ -275,7 +338,7 @@ export class UserController {
         type : updatedUser.type
       };
       const access_token = Jwt.jwtSign(payload , user.aud);
-      const refresh_token = Jwt.jswtSignRefreshToken(payload , user.aud);
+      const refresh_token = await Jwt.jswtSignRefreshToken(payload , user.aud);
       res.json({
         token: access_token,
         refreshToken : refresh_token,
@@ -309,6 +372,28 @@ export class UserController {
         res.json({
           token: access_token,
           refreshToken : refresh_token
+        })
+      }else{
+        req.errorStatus = 403;
+        throw('Access Denied');
+      }
+
+    }catch(e){
+      req.errorStatus = 403;
+      next(e);
+    }
+  }
+
+  static async logout(req , res , next){
+    const refresh_token = req.body.refresh_token;
+
+    try{
+
+      const decoded_data = await Jwt.jwtVerifyRefreshToken(refresh_token);
+      if(decoded_data){
+        
+        res.json({
+         success : true
         })
       }else{
         req.errorStatus = 403;

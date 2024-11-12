@@ -46,12 +46,10 @@ export class Server {
       }).catch(e => console.log(e));
   }
 
- async  connectRedis(){
+  connectRedis() {
     Redis.connectToRedis();
-   await Redis.setValue('abdul' , 'coding');
-    const value = await Redis.getValue('abdul');
-    console.log(value);
-    Redis.deleteKey('abdul');
+   
+
   }
 
   configureBodyParser() {
@@ -89,7 +87,7 @@ export class Server {
     this.app.use((error, req, res, next) => {
       const errorStatus = req.errorStatus || 500;
       res.status(errorStatus).json({
-        message: error.message || "Something went wrong please try again later",
+        message: error.message || "h went wrong please try again later",
         status_code: errorStatus
       })
     })
